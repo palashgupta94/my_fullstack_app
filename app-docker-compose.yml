@@ -1,0 +1,30 @@
+services:
+  frontend:
+    build: 
+      context: ./frontend/app_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"  # Changed to Angular dev server default port
+    command: npm run start -- --host 0.0.0.0 --port 4200 --poll 1000 --disable-host-check
+    volumes:
+      - ./frontend/app_frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,39 @@
+# Dependency directories
+node_modules/
+dist/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Angular cache
+.cache/
+.angular/
+
+# Test coverage
+coverage/
+
+# Miscellaneous
+*.md
+LICENSE
+docker-compose*.yml

@@ -1,0 +1,46 @@
+# Virtual environment
+venv/
+__pycache__/
+*.py[cod]
+
+# Dependency directories
+env/
+.env/
+.env.local
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python packaging
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Git
+.git/
+.gitignore
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Flask/Python specific
+instance/
+.webassets-cache
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Byte-compiled files
+*.pyc

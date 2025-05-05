@@ -1,0 +1,11 @@
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Response from Backend</h4>
+    </div>
+    <div class="card-body">
+      <pre class="bg-light p-3 rounded border">{{ response | json }}</pre>
+      <button class="btn btn-secondary mt-3" (click)="goBack()">Back to Form</button>
+    </div>
+  </div>
+</div>
