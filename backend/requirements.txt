@@ -4,3 +4,5 @@ gunicorn==23.0.0
 certifi==2024.2.2
 flask-cors==4.0.0
 pymongo==4.12.1
+python-dotenv==1.1.0
+logging==0.4.9.6

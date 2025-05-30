@@ -9,7 +9,7 @@ services:
     ports:
       - "5000:5000"
     networks:
-      - app-network
+      - my_fullstack_app_app-network
 
   frontend:
     image: palashgupta94/frontend:v1.0.0
@@ -17,8 +17,8 @@ services:
     ports:
       - "80:80"
     networks:
-      - app-network
+      - my_fullstack_app_app-network
 
 networks:
-  app-network:
-    driver: bridge
+ my_fullstack_app_app-network:
+    external: true

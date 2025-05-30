@@ -1,0 +1,44 @@
+[
+    {
+        "username": "user4",
+        "email": "user4@users.com",
+        "_id": {
+            "$oid": "6834a2e8a3ea206bccdab444"
+        },
+        "id": "834dbd77-8d20-4d64-bee1-48e47660b1f5"
+    },
+    {
+        "username": "user4",
+        "email": "user4@users.com",
+        "_id": {
+            "$oid": "6834a2e8a3ea206bccdab443"
+        },
+        "id": "fd61d4b5-7fa5-4e2c-9ff8-3d7112444d67"
+    },
+    {
+        "username": "user4",
+        "email": "user4@users.com",
+        "_id": "6834a3d9b69ea525a56786f0",
+        "id": "46281fb8-73f7-440a-8b5e-a487e822caf3"
+    },
+    {
+        "username": "user9",
+        "email": "user9@users.com",
+        "id": "9ca31da1-921e-4401-9d76-4923b1f6fe56"
+    },
+    {
+        "username": "user10",
+        "email": "user10@users.com",
+        "id": "971240e2-babf-441e-85b5-7e6c9de36a54"
+    },
+    {
+        "username": "user11",
+        "email": "user11@users.com",
+        "id": "da08252b-a3b0-4b44-a429-02739370b2b7"
+    },
+    {
+        "username": "user12",
+        "email": "user12@user.com",
+        "id": "2de9627b-057f-4340-9033-0a5ddc101db4"
+    }
+]

@@ -1,24 +1,20 @@
-# Stage 1: Build
-FROM node:22-alpine as builder
-
+# Stage 1: Build Angular app
+FROM node:18 AS builder
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --quiet
 
-COPY . .
-RUN npm run build -- --configuration=production
+COPY app_frontend/package*.json ./
+RUN npm install
 
-# Stage 2: Serve
+COPY app_frontend/ ./
+RUN npx ng build --configuration=production
+
+# Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy build files
-COPY --from=builder /app/dist/frontend /usr/share/nginx/html
+RUN rm -rf /etc/nginx/conf.d/*
+COPY default.conf /etc/nginx/conf.d/default.conf
+#RUN ls -l /app/dist/app_frontend
+COPY --from=builder /app/dist/app_frontend/browser /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
