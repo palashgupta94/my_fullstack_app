@@ -131,10 +131,10 @@ This ensures Angular routing works properly with Docker and NGINX.
 
 ## ✅ Useful Links
 
-- 🔗 **GitHub Repository**: [Your GitHub Link Here]
+- 🔗 **GitHub Repository**: [https://github.com/palashgupta94/my_fullstack_app.git]
 - 🐳 **DockerHub Images**:
-  - Backend: [DockerHub backend image link]
-  - Frontend: [DockerHub frontend image link]
+  - Backend: [docker pull palashgupta94/backend:v1.0.0]
+  - Frontend: [docker pull palashgupta94/frontend:v1.0.0]
 
 ---
 
