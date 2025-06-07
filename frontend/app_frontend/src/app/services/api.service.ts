@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ApiService {
 
-  private apiUrl: string = 'http://backend:5000/api/submit';
+  private apiUrl: string = '/api/submit';
 
   constructor(private http: HttpClient) { }
 
