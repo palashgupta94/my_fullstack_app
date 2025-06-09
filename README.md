@@ -1,4 +1,4 @@
-# My Fullstack App 🚀
+# My Fullstack App 
 
 A full-stack web application with:
 
@@ -10,7 +10,20 @@ A full-stack web application with:
 
 ---
 
-## ✅ Prerequisites
+## Table Of Contents:
+* [Prerequisites](#prerequisites)
+* [Features](#features)
+* [Running With Local Dockerized MongoDB](#running-with-local-mongodb-dockerised)
+* [Running With MongoDB Atlas](#running-with-mongodb-atlas)
+* [Running On Baremetal Local System](#running-on-bare-metal-local-system)
+* [Fallback Mechanism](#fallback-mechanism)
+* [Frontend Nginx Configuration](#nginx-configuration-frontend)
+* [Useful Links](#useful-links)
+* [Environment Variable Reference](#environment-variables-reference)
+
+---
+
+## Prerequisites
 
 Before running the app, make sure the following are installed:
 
@@ -22,7 +35,7 @@ Before running the app, make sure the following are installed:
 
 ---
 
-## ✅ Features
+## Features
 
 - Supports all 4 CRUD operations (backend)
 - Frontend supports POST operation only
@@ -31,7 +44,7 @@ Before running the app, make sure the following are installed:
 
 ---
 
-## ✅ Running with Local MongoDB (Dockerised)
+## Running with Local MongoDB (Dockerised)
 
 > Use this method to test locally using a Docker MongoDB instance.
 
@@ -57,7 +70,7 @@ docker compose -f app-local-docker-compose.yml up --build
 
 ---
 
-## ✅ Running with MongoDB Atlas
+## Running with MongoDB Atlas
 
 If you want to connect the backend to a MongoDB Atlas cluster, use the following steps:
 
@@ -79,7 +92,7 @@ docker compose -f app-docker-compose.yml up --build
 
 ---
 
-## ✅ Running on Bare Metal (Local System)
+## Running on Bare Metal (Local System)
 
 If you don't want to use Docker, then:
 
@@ -90,7 +103,7 @@ If you don't want to use Docker, then:
 
 ---
 
-## ✅ Fallback Mechanism
+## Fallback Mechanism
 
 - If MongoDB is not available, the backend will fallback to `fallback_data.json` located at:
 
@@ -100,11 +113,11 @@ If you don't want to use Docker, then:
 
 ---
 
-## ✅ NGINX Configuration (Frontend)
+## NGINX Configuration (Frontend)
 
 The Angular frontend is served via NGINX using the following configuration:
 
-📄 **`frontend/default.conf`**
+**`frontend/default.conf`**
 
 ```nginx
 server {
@@ -129,26 +142,25 @@ This ensures Angular routing works properly with Docker and NGINX.
 
 ---
 
-## ✅ Useful Links
+## Useful Links
 
-- 🔗 **GitHub Repository**: [https://github.com/palashgupta94/my_fullstack_app.git]
-- 🐳 **DockerHub Images**:
+- **GitHub Repository**: [https://github.com/palashgupta94/my_fullstack_app.git]
+- **DockerHub Images**:
   - Backend: [docker pull palashgupta94/backend:v1.0.0]
   - Frontend: [docker pull palashgupta94/frontend:v1.0.0]
 
 ---
 
-## ✅ Environment Variables Reference
+## Environment Variables Reference
 
-`.env` file required in root folder (inside `my_fullstack_app/`):
+#### `.env` file required in root folder (inside `my_fullstack_app/`):
 
 ```env
 MONGODB_ATLAS_URI=mongodb://mymongo:27017   # or use Atlas URI
 MONGODB_DB_NAME=mydatabase
 MONGODB_COLLECTION_NAME=mycollection
-JSON_FALLBACK_PATH=/data/fallback_data.json
 ```
 
 ---
 
-Happy Devving! 💻🔥
+Happy Devving!

@@ -1,0 +1,3 @@
+MONGODB_ATLAS_URI=mongodb://mymongo:27017   # or use Atlas URI
+MONGODB_DB_NAME=mydatabase
+MONGODB_COLLECTION_NAME=mycollection
