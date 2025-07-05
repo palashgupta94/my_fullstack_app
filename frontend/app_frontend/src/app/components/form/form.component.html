@@ -3,6 +3,21 @@
     <div class="col-md-6">
       <h2 class="text-center mb-4">Submit Data</h2>
       <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
+
+        <div class="mb-3">
+          <label for="inputFirstName" class="form-label">First Name</label>
+          <input type="text" class="form-control" name="firstName"
+                 aria-describedby="firstNameHelp" formControlName="firstName">
+          <div id="firstNameHelp" class="form-text">Enter your First Name</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="inputLastName" class="form-label">Last Name</label>
+          <input type="text" class="form-control" name="lastName"
+                 aria-describedby="lastNameHelp" formControlName="lastName">
+          <div id="lastNameHelp" class="form-text">Enter your Last Name</div>
+        </div>
+
         <div class="mb-3">
           <label for="inputUsername" class="form-label">User Name</label>
           <input type="text" class="form-control" id="inputUsername" name="userName"
@@ -16,6 +31,22 @@
                  aria-describedby="emailHelp" formControlName="email">
           <div id="emailHelp" class="form-text">Enter your Email Address</div>
         </div>
+
+        <div class="mb-3">
+          <label for="inputGender" class="form-label">Gender</label>
+          <select class="form-select" id="inputGender" formControlName="gender" >
+            <option value="" disabled selected>Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <div id="genderHelp" class="form-text">Select your gender</div>
+        </div>
+
+        <input type="hidden" formControlName="createdAt">
+        <input type="hidden" formControlName="updatedAt">
+
+
 
         <button class="btn btn-primary w-100" type="submit">Submit</button>
       </form>
