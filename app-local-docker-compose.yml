@@ -12,7 +12,7 @@ services:
       - my_fullstack_app_app-network
 
   frontend:
-    image: palashgupta94/frontend:v1.0.0
+    image: palashgupta94/frontend:v1.1.0
     container_name: frontend
     ports:
       - "80:80"
