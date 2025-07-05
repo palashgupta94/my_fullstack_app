@@ -1,77 +1,135 @@
-# My Fullstack App
+# My Fullstack App (Kubernetes Ready ✅)
 
-A full-stack web application with:
+A full-stack web application built with:
 
-- Flask backend (Python)
-- Angular frontend
-- Docker support
-- MongoDB integration with fallback mechanism
-- NGINX for frontend deployment
-
----
-
-## Prerequisites
-
-Before running the app, make sure the following are installed:
-
-- **Docker** (**Mandatory**)
-- **Node.js**(Optional. Only to run application locally)
-- **Angular CLI**(Optional. Only to run application locally)
-- **Python 3.9+** (optional, if running backend outside Docker)
-- **MongoDB** (optional, needed only if testing with a local MongoDB instance)
+- ✅ Flask backend (Python)
+- ✅ Angular frontend
+- ✅ MongoDB (Local or Atlas) with fallback to JSON
+- ✅ Docker and Kubernetes deployment support
+- ✅ NGINX for frontend routing
 
 ---
 
-## Features
+## Table Of Contents
 
-- Supports all 4 CRUD operations (backend)
-- Frontend supports POST operation only
-- MongoDB support (local/Atlas)
-- JSON fallback support when MongoDB is down or unavailable
+- [Prerequisites](#prerequisites)
+- [Features](#features)
+- [Running With Kubernetes](#running-with-kubernetes)
+- [Running With Docker (Local MongoDB)](#running-with-local-mongodb-dockerised)
+- [Running With MongoDB Atlas](#running-with-mongodb-atlas)
+- [Running On Local System (Baremetal)](#running-on-bare-metal-local-system)
+- [Fallback Mechanism & Mongo Sync Logic](#fallback-mechanism--mongo-sync-logic)
+- [NGINX Frontend Configuration](#nginx-frontend-configuration)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Useful Links](#useful-links)
 
 ---
 
-## Running with Local MongoDB (Dockerised)
+## 🧩 Features
 
-> Use this method to test locally using a Docker MongoDB instance.
+- 🔁 Full CRUD support via Flask backend
+- 🧾 JSON fallback when MongoDB is down
+- 🎯 Angular frontend with form support
+- 📦 Docker and Kubernetes ready
+- 🌐 NGINX static hosting and reverse proxy
 
-### Step 1: Create Docker Bridge Network
+---
+
+## 🧵 Fallback Mechanism & Mongo Sync Logic
+
+### 🔄 Automatic Fallback to JSON
+
+If MongoDB is **down/unreachable**, the backend will automatically:
+
+- Read and write data to `fallback_data.json`
+- Continue serving and storing user data
+- Log all fallback events
+
+Fallback file path (can be customized):
+
+```
+/data/fallback_data.json
+```
+
+### 🧠 MongoDB Auto-Reconnection
+
+- A background thread continuously **monitors MongoDB**.
+- Tries to reconnect every 10 seconds when down.
+
+### 🔁 Sync Fallback to MongoDB
+
+- Another background thread syncs all fallback items from JSON to MongoDB.
+- Runs every 30 seconds.
+- Avoids duplicates using the `id` field.
+
+### 🔐 Thread-safe File Access
+
+- All file operations are wrapped using a `threading.Lock` to prevent race conditions.
+
+---
+
+## 🚀 Running With Kubernetes
+
+### 1. Start Minikube (or kind)
+
+```bash
+minikube start --driver=docker
+```
+
+### 2. Apply Kubernetes YAMLs
+
+```bash
+kubectl apply -f k8s/configmap-app-config.yaml
+kubectl apply -f k8s/configmap-nginx.yaml
+kubectl apply -f k8s/deployment-mongo.yaml
+kubectl apply -f k8s/deployment-backend.yaml
+kubectl apply -f k8s/deployment-frontend.yaml
+kubectl apply -f k8s/ingress.yaml
+```
+
+### 3. Enable Ingress (Minikube only)
+
+```bash
+minikube addons enable ingress
+```
+
+### 4. Add Local DNS Entry
+
+Edit `/etc/hosts`:
+
+```bash
+127.0.0.1 myapp.local
+```
+
+### 5. Visit Application
+
+Open [http://myapp.local](http://myapp.local) in your browser.
+
+---
+
+## 🐋 Running With Local MongoDB (Dockerised)
 
 ```bash
 docker network create my_fullstack_app_app-network
-```
 
-### Step 2: Run MongoDB Container
-
-```bash
 docker run --network=my_fullstack_app_app-network --name mymongo mongo:latest
-```
 
-### Step 3: Use `app-local-docker-compose.yml` to run the app
-
-```bash
 docker compose -f app-local-docker-compose.yml up --build
 ```
 
-> Make sure all services (backend, frontend, mongo) are on the same network (`my_fullstack_app_app-network`).
-
 ---
 
-## Running with MongoDB Atlas
+## ☁️ Running With MongoDB Atlas
 
-If you want to connect the backend to a MongoDB Atlas cluster, use the following steps:
-
-### Step 1: Update the `.env` file in the root of the project (`my_fullstack_app/`)
+Update `.env`:
 
 ```env
-MONGODB_ATLAS_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster
+MONGODB_ATLAS_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/?retryWrites=true&w=majority
 MONGODB_DB_NAME=mydatabase
 MONGODB_COLLECTION_NAME=mycollection
 ```
 
-> Make sure this `.env` file is present in the root directory.
-
-### Step 2: Run the app with:
+Run:
 
 ```bash
 docker compose -f app-docker-compose.yml up --build
@@ -79,32 +137,27 @@ docker compose -f app-docker-compose.yml up --build
 
 ---
 
-## Running on Bare Metal (Local System)
+## 🖥️ Running On Local System (Baremetal)
 
-If you don't want to use Docker, then:
+1. Install Python 3.9+, Flask, Node.js, and Angular CLI
+2. Set up `.env` with Mongo URI or leave Mongo off to use fallback
+3. Start backend:
 
-- Install Node, Angular CLI, Python (Flask), and dependencies
-- MongoDB is optional (fallback JSON will be used if MongoDB is not running)
-- Run backend: `python app.py`
-- Run frontend: `ng serve` or build and serve via NGINX
-
----
-
-## Fallback Mechanism
-
-- If MongoDB is not available, the backend will fallback to `fallback_data.json` located at:
-
+```bash
+python app.py
 ```
-/backend/data/fallback_data.json
+
+4. Start frontend:
+
+```bash
+ng serve
 ```
 
 ---
 
-## NGINX Configuration (Frontend)
+## 🌐 NGINX Frontend Configuration
 
-The Angular frontend is served via NGINX using the following configuration:
-
-**`frontend/default.conf`**
+Used in both Docker and Kubernetes:
 
 ```nginx
 server {
@@ -125,30 +178,29 @@ server {
 }
 ```
 
-This ensures Angular routing works properly with Docker and NGINX.
-
 ---
 
-##  Useful Links
+## 🌱 Environment Variables Reference
 
-- **GitHub Repository**: [https://github.com/palashgupta94/my_fullstack_app.git]
-- **DockerHub Images**:
-  - Backend: [docker pull palashgupta94/backend:v1.0.0]
-  - Frontend: [docker pull palashgupta94/frontend:v1.0.0]
-  - Frontend 1.1.0: [docker pull palashgupta94/frontend:v1.0.0]
----
-
-## Environment Variables Reference
-
-`.env` file required in root folder (inside `my_fullstack_app/`):
+Used via `.env` (for Docker) or ConfigMap (Kubernetes):
 
 ```env
-MONGODB_ATLAS_URI=mongodb://mymongo:27017   # or use Atlas URI
+MONGODB_ATLAS_URI=mongodb://mongo:27017  # or your Atlas URI
 MONGODB_DB_NAME=mydatabase
 MONGODB_COLLECTION_NAME=mycollection
-JSON_FALLBACK_PATH=/data/fallback_data.json
+JSON_FALLBACK_PATH=/data/fallback_data.json  # Optional
 ```
 
 ---
 
-Happy Devving! 💻🔥
+## 🔗 Useful Links
+
+- GitHub: [https://github.com/palashgupta94/my_fullstack_app](https://github.com/palashgupta94/my_fullstack_app)
+- DockerHub:
+  - Backend: `docker pull palashgupta94/backend:v1.0.0`
+  - Frontend: `docker pull palashgupta94/frontend:v1.0.0`
+
+---
+
+✅ Happy Cloud-Native Hacking!
+v
