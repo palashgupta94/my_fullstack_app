@@ -14,12 +14,14 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 import certifi
 
+#load env variables
+load_dotenv()
+
 # Setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
-load_dotenv()
 
 # Environment variables
 MONGODB_ATLAS_URI = os.getenv("MONGODB_ATLAS_URI")
