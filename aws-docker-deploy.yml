@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  backend:
+    image: public.ecr.aws/i8k8x5q9/my-backend-repo:latest
+    container_name: backend
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./backend/data:/data
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  frontend:
+    image: public.ecr.aws/i8k8x5q9/my-frontend-repo:latest
+    container_name: frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+version: "3.8"
+
+services:
+  backend:
+    image: public.ecr.aws/i8k8x5q9/my-backend-repo:latest
+    container_name: backend
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./backend/data:/data
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  frontend:
+    image: public.ecr.aws/i8k8x5q9/my-frontend-repo:latest
+    container_name: frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

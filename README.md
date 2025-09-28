@@ -1,14 +1,13 @@
-
-# My Fullstack App (Kubernetes Ready ✅)
+# My Fullstack App (Kubernetes and AWS Ready)
 
 
 A full-stack web application built with:
 
-- ✅ Flask backend (Python)
-- ✅ Angular frontend
-- ✅ MongoDB (Local or Atlas) with fallback to JSON
-- ✅ Docker and Kubernetes deployment support
-- ✅ NGINX for frontend routing
+- Flask backend (Python)
+- Angular frontend
+- MongoDB (Local or Atlas) with fallback to JSON
+- Docker and Kubernetes deployment support
+- NGINX for frontend routing
 
 ---
 
@@ -23,23 +22,24 @@ A full-stack web application built with:
 - [Fallback Mechanism & Mongo Sync Logic](#fallback-mechanism--mongo-sync-logic)
 - [NGINX Frontend Configuration](#nginx-frontend-configuration)
 - [Environment Variables Reference](#environment-variables-reference)
+- [AWS Support](#aws-amazon-web-services-deployment)
 - [Useful Links](#useful-links)
 
 ---
 
-## 🧩 Features
+## Features
 
-- 🔁 Full CRUD support via Flask backend
-- 🧾 JSON fallback when MongoDB is down
-- 🎯 Angular frontend with form support
-- 📦 Docker and Kubernetes ready
-- 🌐 NGINX static hosting and reverse proxy
+- Full CRUD support via Flask backend
+- JSON fallback when MongoDB is down
+- Angular frontend with form support
+- Docker and Kubernetes ready
+- NGINX static hosting and reverse proxy
 
 ---
 
-## 🧵 Fallback Mechanism & Mongo Sync Logic
+## Fallback Mechanism & Mongo Sync Logic
 
-### 🔄 Automatic Fallback to JSON
+### Automatic Fallback to JSON
 
 If MongoDB is **down/unreachable**, the backend will automatically:
 
@@ -53,24 +53,24 @@ Fallback file path (can be customized):
 /data/fallback_data.json
 ```
 
-### 🧠 MongoDB Auto-Reconnection
+### MongoDB Auto-Reconnection
 
 - A background thread continuously **monitors MongoDB**.
 - Tries to reconnect every 10 seconds when down.
 
-### 🔁 Sync Fallback to MongoDB
+### Sync Fallback to MongoDB
 
 - Another background thread syncs all fallback items from JSON to MongoDB.
 - Runs every 30 seconds.
 - Avoids duplicates using the `id` field.
 
-### 🔐 Thread-safe File Access
+### Thread-safe File Access
 
 - All file operations are wrapped using a `threading.Lock` to prevent race conditions.
 
 ---
 
-## 🚀 Running With Kubernetes
+## Running With Kubernetes
 
 ### 1. Start Minikube (or kind)
 
@@ -109,7 +109,7 @@ Open [http://myapp.local](http://myapp.local) in your browser.
 
 ---
 
-## 🐋 Running With Local MongoDB (Dockerised)
+## Running With Local MongoDB (Dockerised)
 
 ```bash
 docker network create my_fullstack_app_app-network
@@ -121,7 +121,7 @@ docker compose -f app-local-docker-compose.yml up --build
 
 ---
 
-## ☁️ Running With MongoDB Atlas
+## Running With MongoDB Atlas
 
 Update `.env`:
 
@@ -139,7 +139,7 @@ docker compose -f app-docker-compose.yml up --build
 
 ---
 
-## 🖥️ Running On Local System (Baremetal)
+## Running On Local System (Baremetal)
 
 1. Install Python 3.9+, Flask, Node.js, and Angular CLI
 2. Set up `.env` with Mongo URI or leave Mongo off to use fallback
@@ -157,7 +157,7 @@ ng serve
 
 ---
 
-## 🌐 NGINX Frontend Configuration
+## NGINX Frontend Configuration
 
 Used in both Docker and Kubernetes:
 
@@ -182,7 +182,7 @@ server {
 
 ---
 
-## 🌱 Environment Variables Reference
+## Environment Variables Reference
 
 Used via `.env` (for Docker) or ConfigMap (Kubernetes):
 
@@ -195,7 +195,217 @@ JSON_FALLBACK_PATH=/data/fallback_data.json  # Optional
 
 ---
 
-## 🔗 Useful Links
+## AWS (Amazon Web Services) Deployment
+
+### 1. Deploy Backend and Frontend on single EC2 Instance
+1. Launch an **EC2 instance** (Ubuntu 22.04 recommended).
+2. Connect to EC2 using SSH:
+
+```bash
+ssh -i mykey.pem ubuntu@<EC2_PUBLIC_IP>
+```
+3. Update packages:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+4. Install dependencies:
+```bash
+sudo apt install -y python3 python3-pip nodejs npm nginx git
+```
+
+5. Clone your repository:
+```bash
+git clone https://github.com/username/my_fullstack_app.git
+cd my_fullstack_app
+```
+
+6. Setup backend (Flask):
+```bash
+cd backend
+pip3 install -r requirements.txt
+nohup python3 app.py --host=0.0.0.0 --port=5000 &
+```
+7. Build frontend (Angular/Express):
+```bash
+cd ../frontend
+npm install
+npm run build
+```
+
+8. Configure Nginx to serve frontend and proxy `/api` to Flask:
+```bash
+sudo nano /etc/nginx/sites-available/myapp
+```
+
+Example:
+```json
+server {
+  listen 80;
+  server_name _;
+  root /home/ubuntu/my_fullstack_app/frontend/dist;
+  index index.html;
+
+  location / {
+    try_files $uri /index.html;
+  }
+
+  location /api {
+    proxy_pass http://127.0.0.1:5000;
+  }
+}
+
+```
+9. Copy build files to Nginx web root
+The default root is /var/www/html/ (it gets created after installing Nginx):
+```bash
+sudo rm -rf /var/www/html/*
+sudo cp -r dist/your-project-name/* /var/www/html/
+```
+
+10. Restart Nginx
+```bash
+sudo systemctl restart nginx
+```
+11. Access the app via `http://<EC2_PUBLIC_IP>`.
+
+---
+
+### 2. Deploy Backend & Frontend in Separate EC2 Instances
+- Flask backend
+  1. Launch an EC2 instance for backend.
+  2. SSH into instance and install Python:
+  ```bash
+  sudo apt update && sudo apt install -y python3 python3-pip git
+  ```
+  3. Clone repo and run Flask app:
+  ```bash
+  git clone https://github.com/username/my_fullstack_app.git
+  cd my_fullstack_app/backend
+  pip3 install -r requirements.txt
+  nohup python3 app.py --host=0.0.0.0 --port=5000 &
+  ```
+  4. Ensure security group allows inbound traffic on port `5000`.
+  ---
+- Angular Frontend
+  1. Launch another EC2 instance for frontend.
+  
+  2. SSH into instance and install Node.js + Nginx:
+  ```bash
+  sudo apt update && sudo apt install -y nodejs npm nginx git
+  ```
+  
+  3. Clone repo and build frontend:
+  ```bash
+  git clone https://github.com/username/my_fullstack_app.git
+  cd my_fullstack_app/frontend
+  npm install
+  npm run build
+  ```
+  
+  4. Configure Nginx to serve frontend and forward API requests to **backend’s private IP or EC2 public DNS**
+  ```json
+  location /api {
+    proxy_pass http://<BACKEND_EC2_PRIVATE_IP>:5000;
+  }
+  ```
+  
+  5. Copy build files to Nginx web root
+  The default root is /var/www/html/ (it gets created after installing Nginx):
+  ```bash
+    sudo rm -rf /var/www/html/*
+    sudo cp -r dist/your-project-name/* /var/www/html/
+  ```
+  
+  6. Restart Nginx
+  ```bash
+  sudo systemctl restart nginx
+  ```
+  
+  7. Access the frontend via `http://<FRONTEND_EC2_PUBLIC_IP>`
+  
+---
+### 3. Deploy Backend & Frontend Using **Docker + ECR + ECS + VPC**
+1. Build Docker Image
+```bash
+# Backend
+cd backend
+docker build -t my-backend -f Aws_Dockerfile .
+
+# Frontend
+cd ../frontend
+docker build -t my-frontend -f Aws_Dockerfile .
+```
+2. Push Images to Amazon ECR
+    
+    1. Create ECR repositories:
+    ```bash
+    aws ecr create-repository --repository-name my-backend
+    aws ecr create-repository --repository-name my-frontend
+    ```
+
+    2. Authenticate Docker with ECR:
+    ```bash
+    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <account_id>.dkr.ecr.ap-south-1.amazonaws.com
+    ```
+
+    3. Tag & push images:
+    ```bash
+    docker tag my-backend:latest <account_id>.dkr.ecr.ap-south-1.amazonaws.com/my-backend:latest
+    docker tag my-frontend:latest <account_id>.dkr.ecr.ap-south-1.amazonaws.com/my-frontend:latest
+
+    docker push <account_id>.dkr.ecr.ap-south-1.amazonaws.com/my-backend:latest
+    docker push <account_id>.dkr.ecr.ap-south-1.amazonaws.com/my-frontend:latest
+    ```
+
+  3. Create ECS Cluster
+    - Go to ECS console → Create cluster → Select VPC + Subnets.
+
+  4. Define Task Definitions
+      - One for backend (Flask).
+
+      - One for frontend (Angular/Express).
+
+      - Set container ports `(5000 for backend, 80 for frontend)`.
+
+  5. Create ECS Service
+      - Create a service for backend.
+
+      - Create a service for frontend.
+
+      - Attach services to Application Load Balancer (ALB) or Cloud Map.
+
+  6. Update Frontend Env Var
+
+      - Set `BACKEND_URL` in frontend in Frontend Nginx.conf → `backend.myapp.local:5000` or `<Backend IP>:5000` (Cloud Map).
+
+  Example
+  ```json
+    Server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+      root /usr/share/nginx/html;
+      index index.html index.htm;
+      try_files $uri $uri/ /index.html;
+    }
+
+    location /api {
+      proxy_pass http://$BACKEND_URL;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+    }
+  }
+  ```
+
+  7. Verify With Frontend Public IP.
+      - `http://<Frontend public IP>`.
+      If doesn't work go to ECS Console -> Cluster & Service -> Select Frontend Service -> Task Details -> Click on task details of running task ->Copy Security Group Id -> Go to EC2 Console -> Security Groups -> Select Group (paste copied id in search bar) -> Inbound Group -> validate port 80 -> If not -> Edit Inbound Rules -> Add Rule -> Type Http (port 80 will get select by default) -> Source 0.0.0.0/0 -> save rule. ->  try again 
+
+---
+
+## Useful Links
 
 - GitHub: [https://github.com/palashgupta94/my_fullstack_app](https://github.com/palashgupta94/my_fullstack_app)
 - DockerHub:
@@ -204,5 +414,4 @@ JSON_FALLBACK_PATH=/data/fallback_data.json  # Optional
 
 ---
 
-✅ Happy Cloud-Native Hacking!
-v
+Happy Cloud-Native Hacking!
