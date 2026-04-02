@@ -415,3 +415,180 @@ docker build -t my-frontend -f Aws_Dockerfile .
 ---
 
 Happy Cloud-Native Hacking!
+
+---
+
+## Terraform Deployment (AWS)
+
+Three deployment configurations using Terraform and AWS.
+
+### Prerequisites
+
+- Terraform >= 1.5 installed
+- AWS CLI configured (`aws configure`)
+- EC2 Key Pair created in AWS Console
+- S3 bucket for Terraform state
+
+### Create S3 State Bucket (Run Once)
+```bash
+aws s3api create-bucket \
+  --bucket my-terraform-state-bucket \
+  --region ap-south-1 \
+  --create-bucket-configuration LocationConstraint=ap-south-1
+
+aws s3api put-bucket-versioning \
+  --bucket my-terraform-state-bucket \
+  --versioning-configuration Status=Enabled
+```
+
+---
+
+### Part 1 — Single EC2 Instance (Flask + Angular)
+
+Both Flask (port 5000) and Angular (port 80 via Nginx) run on a single EC2 instance.
+
+**Architecture:**
+```
+Internet → EC2 (Public IP)
+              ├── Flask  :5000  (systemd service)
+              └── Nginx  :80    (serves Angular, proxies /api to Flask)
+```
+
+**Deploy:**
+```bash
+cd part1
+terraform init
+terraform plan  -var="key_name=YOUR_KEY_PAIR"
+terraform apply -var="key_name=YOUR_KEY_PAIR"
+```
+
+**Access:**
+```bash
+terraform output app_url    # Angular frontend
+terraform output flask_url  # Flask backend
+```
+
+---
+
+### Part 2 — Separate EC2 Instances
+
+Flask and Angular run on two separate EC2 instances inside a custom VPC.
+
+**Architecture:**
+```
+Internet
+  ├── Angular EC2 (Public IP) :80   → Flask EC2 (Private IP) :5000
+  └── Flask EC2   (Public IP) :5000
+```
+
+**Deploy:**
+```bash
+cd part2
+terraform init
+terraform plan  -var="key_name=YOUR_KEY_PAIR"
+terraform apply -var="key_name=YOUR_KEY_PAIR"
+```
+
+**Access:**
+```bash
+terraform output angular_url   # Angular frontend
+terraform output flask_url     # Flask backend
+```
+
+---
+
+### Part 3 — Docker + ECR + ECS + ALB
+
+Both apps run as Docker containers on ECS Fargate with ALB path-based routing.
+
+**Architecture:**
+```
+Internet → ALB (port 80)
+              ├── /api/* → ECS Flask Service  (Fargate, port 5000)
+              └── /*     → ECS Angular Service (Fargate, port 80)
+```
+
+**Step 1 — Create ECR repos:**
+```bash
+cd part3
+terraform init
+terraform apply \
+  -target=aws_ecr_repository.backend \
+  -target=aws_ecr_repository.frontend
+```
+
+**Step 2 — Build and push Docker images:**
+```bash
+AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+REGION=ap-south-1
+
+aws ecr get-login-password --region $REGION | \
+  docker login --username AWS --password-stdin \
+  $AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com
+
+# Backend
+cd backend
+docker build -t my-backend -f Aws_Dockerfile .
+docker tag my-backend:latest \
+  $AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/my-backend:latest
+docker push \
+  $AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/my-backend:latest
+
+# Frontend
+cd ../frontend
+docker build -t my-frontend -f Aws_Dockerfile .
+docker tag my-frontend:latest \
+  $AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/my-frontend:latest
+docker push \
+  $AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/my-frontend:latest
+```
+
+**Step 3 — Deploy full infrastructure:**
+```bash
+cd part3
+terraform apply
+terraform output alb_dns_name
+```
+
+**Access:**
+```bash
+terraform output app_url  # Angular via ALB
+terraform output api_url  # Flask via ALB
+```
+
+---
+
+### Destroy Resources (Avoid AWS Charges)
+```bash
+cd part1 && terraform destroy -var="key_name=YOUR_KEY_PAIR"
+cd part2 && terraform destroy -var="key_name=YOUR_KEY_PAIR"
+cd part3 && terraform destroy
+```
+
+---
+
+## Folder Structure
+```
+my_fullstack_app/
+├── backend/              # Flask Python app
+├── frontend/             # Angular app
+├── k8s/                  # Kubernetes manifests
+├── part1/                # Terraform: Single EC2
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── user_data.sh
+├── part2/                # Terraform: Separate EC2s
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── flask_user_data.sh
+│   └── angular_user_data.sh
+├── part3/                # Terraform: Docker + ECS + ALB
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── app-docker-compose.yml
+├── app-local-docker-compose.yml
+└── README.md
+```
